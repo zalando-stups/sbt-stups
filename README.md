@@ -29,7 +29,7 @@ This sbt-plugin is deliberately designed to have a small minimal set of tasks wh
 integrate with your current sbt build. The plugin has the following tasks
 
 * createScmSource: This creates a `scm-source.json` file. Configure the the `scmSourceDirectory`
-to the location of where you want the file to be created. Be default it is created in your base
+to the location of where you want the file to be created. By default it is created in your base
 directory however if you are using something like [sbt-docker](https://github.com/marcuslonnberg/sbt-docker)
 you should probably use something like
 ```sbt
@@ -62,7 +62,7 @@ lazy val deploy = taskKey[Unit]("Deploys the application into Kio")
 deploy := Def.sequential(
   docker,
   dockerPush in docker,
-  kioTeamName
+  createKioVersion
 ).value
 ```
 
