@@ -51,6 +51,7 @@ object SbtStupsPlugin extends AutoPlugin {
       kioApplicationName := name.value,
       dockerVersion := version.value,
       createScmSource := {
+        streams.value.log.info("Creating scm-source.json")
         try {
           val rev = (List("git", "rev-parse", "HEAD") !!).trim
           val url =
