@@ -4,6 +4,7 @@ import sbt.Keys._
 import sbt._
 
 import scala.language.postfixOps
+import scala.util.control.NonFatal
 
 object SbtStupsPlugin extends AutoPlugin {
   object autoImport {
@@ -69,7 +70,7 @@ object SbtStupsPlugin extends AutoPlugin {
           val file = scmSourceDirectory.value / "scm-source.json"
           IO.write(file, outputJson)
         } catch {
-          case e: Throwable =>
+          case NonFatal(_) =>
             sys.error("Could not create scm-source.json")
         }
       },
