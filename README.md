@@ -21,9 +21,17 @@ available in your path
 * kio
 * mai
 
-Since SBT-stups is an autoplugin, you don't need to do anything explicit to enable it
+Since SBT-stups is an autoplugin, you don't need to do anything explicit to enable it.
 
 ### Usage
+
+Before being able to use the plugin, you have to configure the following settings
+on your building:
+
+- kioTeamName: your team name as known by kio
+- pierOneUrl: pier one url where docker images should be published
+
+There are other settings available, as we will see below.
 
 This sbt-plugin is deliberately designed to have a small minimal set of tasks which you
 integrate with your current sbt build. The plugin has the following tasks
