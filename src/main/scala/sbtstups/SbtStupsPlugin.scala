@@ -32,6 +32,17 @@ object SbtStupsPlugin extends AutoPlugin {
         "Your docker artifact name, defaults to Keys.normalizedName.value")
     lazy val dockerVersion =
       settingKey[String]("Your docker version, defaults to version")
+
+    // Path prefix settings
+    lazy val kioPathPrefix =
+      settingKey[String]("Prefix for kio if you are using a custom path")
+    lazy val pierOnePathPrefix =
+      settingKey[String]("Prefix for pierOne if you are using a custom path")
+    lazy val maiPathPrefix =
+      settingKey[String]("Prefix for mai if you are using a custom path")
+    lazy val gitPathPrefix =
+      settingKey[String]("Git path prefix if you are using a custom path")
+
   }
 
   import autoImport._
@@ -40,25 +51,21 @@ object SbtStupsPlugin extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] =
     super.projectSettings ++ Seq(
-      kioTeamName := sys.error(
-        "A kioTeamName isn't defined. Please define one"),
       scmSourceDirectory := baseDirectory.value,
       kioApplicationVersion := version.value,
       maiProfile := kioTeamName.value,
       pierOneTeamName := kioTeamName.value,
-      pierOneUrl := sys.error(
-        "A pierOneUrl isn't defined. Please define one."),
       dockerArtifactName := Keys.normalizedName.value,
       kioApplicationName := name.value,
       dockerVersion := version.value,
       createScmSource := {
         streams.value.log.info("Creating scm-source.json")
         try {
-          val rev = (List("git", "rev-parse", "HEAD") !!).trim
+          val rev = (List(s"${gitPathPrefix.value}git", "rev-parse", "HEAD") !!).trim
           val url =
-            (List("git", "config", "--get", "remote.origin.url") !!).trim
+            (List(s"${gitPathPrefix.value}git", "config", "--get", "remote.origin.url") !!).trim
           val status =
-            (List("git", "status", "--porcelain") !!).replaceAll("\n", "")
+            (List(s"${gitPathPrefix.value}git", "status", "--porcelain") !!).replaceAll("\n", "")
           val user = sys.env("USER").trim
           val finalRev = if (!rev.isEmpty) {
             s"$rev (locally modified)"
@@ -76,13 +83,13 @@ object SbtStupsPlugin extends AutoPlugin {
       },
       pierOneLogin := {
         streams.value.log.info("Logging into pierone")
-        val pieroneLogin = List("pierone", "login") !
+        val pieroneLogin = List(s"${pierOnePathPrefix.value}pierone", "login") !
 
         if (pieroneLogin != 0)
           sys.error("Could not log into pierone")
       },
       maiLogin := {
-        val maiLogin = List("mail", "login", maiProfile.value) !
+        val maiLogin = List(s"${maiPathPrefix.value}mail", "login", maiProfile.value) !
 
         if (maiLogin != 0)
           sys.error("Could not log into mai")
@@ -90,7 +97,7 @@ object SbtStupsPlugin extends AutoPlugin {
       createKioVersion := {
         streams.value.log.info("Creating Kio application version")
         val publishToKio = List(
-          "kio",
+          s"${kioPathPrefix.value}kio",
           "versions",
           "create",
           kioApplicationName.value,
@@ -101,7 +108,11 @@ object SbtStupsPlugin extends AutoPlugin {
         if (publishToKio != 0)
           sys.error("Could not publish to Kio")
       },
-      createKioVersion <<= createKioVersion dependsOn maiLogin
+      createKioVersion <<= createKioVersion dependsOn maiLogin,
+      kioPathPrefix := "",
+      pierOnePathPrefix := "",
+      maiPathPrefix := "",
+      gitPathPrefix := ""
     )
 
 }

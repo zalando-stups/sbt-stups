@@ -8,7 +8,7 @@ sbtPlugin := true
 
 organization := "org.zalando"
 
-scalafmtConfig := Some(file(".scalafmt"))
+scalafmtConfig := Some(file(".scalafmt.conf"))
 
 publishMavenStyle := true
 
