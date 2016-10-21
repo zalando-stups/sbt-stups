@@ -89,7 +89,7 @@ object SbtStupsPlugin extends AutoPlugin {
           sys.error("Could not log into pierone")
       },
       maiLogin := {
-        val maiLogin = List(s"${maiPathPrefix.value}mail", "login", maiProfile.value) !
+        val maiLogin = List(s"${maiPathPrefix.value}mai", "login", maiProfile.value) !
 
         if (maiLogin != 0)
           sys.error("Could not log into mai")
