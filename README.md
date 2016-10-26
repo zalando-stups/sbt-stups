@@ -10,7 +10,7 @@ and creating a new application version into [kio](https://github.com/zalando-stu
 Simply put the following into your `build/plugins.sbt` file
 
 ```sbt
-addSbtPlugin("org.zalando" % "sbt-stups" % "0.1.0")
+addSbtPlugin("org.zalando" % "sbt-stups" % "0.1.1")
 ```
 
 For this plugin to work, you need to have the following installed on your system and

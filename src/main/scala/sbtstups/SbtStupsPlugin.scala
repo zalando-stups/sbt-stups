@@ -60,26 +60,21 @@ object SbtStupsPlugin extends AutoPlugin {
       dockerVersion := version.value,
       createScmSource := {
         streams.value.log.info("Creating scm-source.json")
-        try {
-          val rev = (List(s"${gitPathPrefix.value}git", "rev-parse", "HEAD") !!).trim
-          val url =
-            (List(s"${gitPathPrefix.value}git", "config", "--get", "remote.origin.url") !!).trim
-          val status =
-            (List(s"${gitPathPrefix.value}git", "status", "--porcelain") !!).replaceAll("\n", "")
-          val user = sys.env("USER").trim
-          val finalRev = if (!rev.isEmpty) {
-            s"$rev (locally modified)"
-          } else {
-            rev
-          }
-          val outputJson =
-            s"""{"url":"git:$url","revision":"$finalRev","author":"$user","status":"$status"}"""
-          val file = scmSourceDirectory.value / "scm-source.json"
-          IO.write(file, outputJson)
-        } catch {
-          case NonFatal(_) =>
-            sys.error("Could not create scm-source.json")
+        val rev = (List(s"${gitPathPrefix.value}git", "rev-parse", "HEAD") !!).trim
+        val url =
+          (List(s"${gitPathPrefix.value}git", "config", "--get", "remote.origin.url") !!).trim
+        val status =
+          (List(s"${gitPathPrefix.value}git", "status", "--porcelain") !!).replaceAll("\n", "")
+        val user = sys.env("USER").trim
+        val finalRev = if (!rev.isEmpty) {
+          s"$rev (locally modified)"
+        } else {
+          rev
         }
+        val outputJson =
+          s"""{"url":"git:$url","revision":"$finalRev","author":"$user","status":"$status"}"""
+        val file = scmSourceDirectory.value / "scm-source.json"
+        IO.write(file, outputJson)
       },
       pierOneLogin := {
         streams.value.log.info("Logging into pierone")
