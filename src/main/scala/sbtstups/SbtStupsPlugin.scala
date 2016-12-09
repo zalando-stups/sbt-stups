@@ -64,9 +64,9 @@ object SbtStupsPlugin extends AutoPlugin {
         val url =
           (List(s"${gitPathPrefix.value}git", "config", "--get", "remote.origin.url") !!).trim
         val status =
-          (List(s"${gitPathPrefix.value}git", "status", "--porcelain") !!).replaceAll("\n", "")
+          (List(s"${gitPathPrefix.value}git", "status", "--porcelain") !!).replaceAll("\n", "").trim
         val user = sys.env("USER").trim
-        val finalRev = if (!rev.isEmpty) {
+        val finalRev = if (!status.isEmpty) {
           s"$rev (locally modified)"
         } else {
           rev
