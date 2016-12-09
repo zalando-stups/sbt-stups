@@ -60,11 +60,17 @@ object SbtStupsPlugin extends AutoPlugin {
       dockerVersion := version.value,
       createScmSource := {
         streams.value.log.info("Creating scm-source.json")
-        val rev = (List(s"${gitPathPrefix.value}git", "rev-parse", "HEAD") !!).trim
+        val rev =
+          (List(s"${gitPathPrefix.value}git", "rev-parse", "HEAD") !!).trim
         val url =
-          (List(s"${gitPathPrefix.value}git", "config", "--get", "remote.origin.url") !!).trim
+          (List(s"${gitPathPrefix.value}git",
+                "config",
+                "--get",
+                "remote.origin.url") !!).trim
         val status =
-          (List(s"${gitPathPrefix.value}git", "status", "--porcelain") !!).replaceAll("\n", "").trim
+          (List(s"${gitPathPrefix.value}git", "status", "--porcelain") !!)
+            .replaceAll("\n", "")
+            .trim
         val user = sys.env("USER").trim
         val finalRev = if (!status.isEmpty) {
           s"$rev (locally modified)"
@@ -78,13 +84,15 @@ object SbtStupsPlugin extends AutoPlugin {
       },
       pierOneLogin := {
         streams.value.log.info("Logging into pierone")
-        val pieroneLogin = List(s"${pierOnePathPrefix.value}pierone", "login") !
+        val pieroneLogin =
+          List(s"${pierOnePathPrefix.value}pierone", "login") !
 
         if (pieroneLogin != 0)
           sys.error("Could not log into pierone")
       },
       maiLogin := {
-        val maiLogin = List(s"${maiPathPrefix.value}mai", "login", maiProfile.value) !
+        val maiLogin =
+          List(s"${maiPathPrefix.value}mai", "login", maiProfile.value) !
 
         if (maiLogin != 0)
           sys.error("Could not log into mai")
