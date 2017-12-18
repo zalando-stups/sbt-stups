@@ -1,14 +1,14 @@
 name := "sbt-stups"
 
-version := "0.2.0"
+version := "0.3.0"
 
-scalaVersion := "2.10.6"
+crossSbtVersions := Vector("0.13.16", "1.0.4")
 
 sbtPlugin := true
 
 organization := "org.zalando"
 
-scalafmtConfig := Some(file(".scalafmt.conf"))
+scalafmtVersion in ThisBuild := "1.1.0"
 
 publishMavenStyle := true
 

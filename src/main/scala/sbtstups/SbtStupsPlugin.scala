@@ -4,7 +4,7 @@ import sbt.Keys._
 import sbt._
 
 import scala.language.postfixOps
-import scala.util.control.NonFatal
+import sys.process.{Process, ProcessBuilder}
 
 object SbtStupsPlugin extends AutoPlugin {
   object autoImport {
@@ -12,7 +12,7 @@ object SbtStupsPlugin extends AutoPlugin {
     lazy val createKioVersion =
       taskKey[Unit]("Creates a new kio version of your application")
     lazy val pierOneLogin = taskKey[Unit]("Log into pierone")
-    lazy val zawsLogin     = taskKey[Unit]("Log into zaws")
+    lazy val zawsLogin    = taskKey[Unit]("Log into zaws")
 
     lazy val scmSourceDirectory =
       settingKey[File]("Destination for scm-source.json output file")
@@ -49,6 +49,8 @@ object SbtStupsPlugin extends AutoPlugin {
 
   override def trigger: PluginTrigger = allRequirements
 
+  private def cmd(input: String*): ProcessBuilder = Process(input)
+
   override def projectSettings: Seq[Setting[_]] =
     super.projectSettings ++ Seq(
       scmSourceDirectory := baseDirectory.value,
@@ -61,16 +63,15 @@ object SbtStupsPlugin extends AutoPlugin {
       createScmSource := {
         streams.value.log.info("Creating scm-source.json")
         val rev =
-          (List(s"${gitPathPrefix.value}git", "rev-parse", "HEAD") !!).trim
+          (cmd(s"${gitPathPrefix.value}git", "rev-parse", "HEAD") !!).trim
         val url =
-          (List(s"${gitPathPrefix.value}git",
-                "config",
-                "--get",
-                "remote.origin.url") !!).trim
+          (cmd(s"${gitPathPrefix.value}git",
+               "config",
+               "--get",
+               "remote.origin.url") !!).trim
         val status =
-          (List(s"${gitPathPrefix.value}git", "status", "--porcelain") !!)
+          (cmd(s"${gitPathPrefix.value}git", "status", "--porcelain") !!)
             .replaceAll("\n", "")
-            .trim
         val user = sys.env("USER").trim
         val finalRev = if (!status.isEmpty) {
           s"$rev (locally modified)"
@@ -85,21 +86,24 @@ object SbtStupsPlugin extends AutoPlugin {
       pierOneLogin := {
         streams.value.log.info("Logging into pierone")
         val pieroneLogin =
-          List(s"${pierOnePathPrefix.value}pierone", "login") !
+          cmd(s"${pierOnePathPrefix.value}pierone",
+              "login",
+              "--url",
+              pierOneUrl.value) !
 
         if (pieroneLogin != 0)
           sys.error("Could not log into pierone")
       },
       zawsLogin := {
         val zawsLogin =
-          List(s"${zawsPathPrefix.value}zaws", "login", zawsProfile.value) !
+          cmd(s"${zawsPathPrefix.value}zaws", "login", zawsProfile.value) !
 
         if (zawsLogin != 0)
           sys.error("Could not log into zaws")
       },
       createKioVersion := {
         streams.value.log.info("Creating Kio application version")
-        val publishToKio = List(
+        val publishToKio = cmd(
           s"${kioPathPrefix.value}kio",
           "versions",
           "create",
@@ -111,7 +115,7 @@ object SbtStupsPlugin extends AutoPlugin {
         if (publishToKio != 0)
           sys.error("Could not publish to Kio")
       },
-      createKioVersion <<= createKioVersion dependsOn zawsLogin,
+      createKioVersion := (createKioVersion dependsOn zawsLogin).value,
       kioPathPrefix := "",
       pierOnePathPrefix := "",
       zawsPathPrefix := "",
