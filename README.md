@@ -10,7 +10,7 @@ and creating a new application version into [kio](https://github.com/zalando-stu
 Simply put the following into your `build/plugins.sbt` file
 
 ```sbt
-addSbtPlugin("org.zalando" % "sbt-stups" % "0.1.2")
+addSbtPlugin("org.zalando" % "sbt-stups" % "0.3.0")
 ```
 
 For this plugin to work, you need to have the following installed on your system and
@@ -19,7 +19,7 @@ available in your path
 * git
 * pierone
 * kio
-* mai
+* zaws
 
 Since SBT-stups is an autoplugin, you don't need to do anything explicit to enable it.
 
@@ -46,7 +46,7 @@ scmSourceDirectory := (stagingDirectory in Universal).value
 * pierOneLogin: This logs into pierone. This should be done before pushing your repository
 into docker, i.e. if you are using the sbt-docker plugin.
 ```sbt
-(dockerPush in docker) <<= (dockerPush in docker) dependsOn pierOneLogin
+(dockerPush in docker) := (dockerPush in docker) dependsOn pierOneLogin
 ```
 * maiLogin: This runs the `mai` command line tool to set up AWS login credentials. You usually
 dont need to use this task directly as `createKioVersion` will call this automatically. Use the 
@@ -64,7 +64,7 @@ in a single command (again assuming you are using sbt-docker)
 lazy val deploy = taskKey[Unit]("Deploys the application into Kio")
 
 // Make our dockerPush login to pierone first
-(dockerPush in docker) <<= (dockerPush in docker) dependsOn pierOneLogin
+(dockerPush in docker) := (dockerPush in docker) dependsOn pierOneLogin
 
 // Create a docker image, then push into pierone and then create a new version in kio
 deploy := Def.sequential(
