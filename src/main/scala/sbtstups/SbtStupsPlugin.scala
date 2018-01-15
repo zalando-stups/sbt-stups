@@ -30,7 +30,7 @@ object SbtStupsPlugin extends AutoPlugin {
     lazy val dockerArtifactName =
       settingKey[String](
         "Your docker artifact name, defaults to Keys.normalizedName.value")
-    lazy val dockerVersion =
+    lazy val stupsDockerVersion =
       settingKey[String]("Your docker version, defaults to version")
 
     // Path prefix settings
@@ -59,7 +59,7 @@ object SbtStupsPlugin extends AutoPlugin {
       pierOneTeamName := kioTeamName.value,
       dockerArtifactName := Keys.normalizedName.value,
       kioApplicationName := name.value,
-      dockerVersion := version.value,
+      stupsDockerVersion := version.value,
       createScmSource := {
         streams.value.log.info("Creating scm-source.json")
         val rev =
@@ -109,7 +109,7 @@ object SbtStupsPlugin extends AutoPlugin {
           "create",
           kioApplicationName.value,
           kioApplicationVersion.value,
-          s"${pierOneUrl.value}/${pierOneTeamName.value}/${dockerArtifactName.value}:${dockerVersion.value}"
+          s"${pierOneUrl.value}/${pierOneTeamName.value}/${dockerArtifactName.value}:${stupsDockerVersion.value}"
         ) !
 
         if (publishToKio != 0)
