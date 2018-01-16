@@ -1,6 +1,6 @@
 name := "sbt-stups"
 
-version := "0.3.0"
+version := "0.4.0"
 
 crossSbtVersions := Vector("0.13.16", "1.0.4")
 
